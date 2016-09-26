@@ -12,6 +12,14 @@ string directory;
 
 int main(int argc, char* argv[])
 {
+	if(argc < 2)
+	{
+		cout << "入力ファイルがありません．\n";
+		cout << "Enterキーを押してください．\n";
+		getchar();
+		return -1;
+	}
+
 	directory = argv[1];
 	string input_file_name = directory + "\\input.csv";
 	string image_name[3];
@@ -120,9 +128,21 @@ int main(int argc, char* argv[])
 			cell[m].setPoint0(x_min, y_min);
 			cell[m].setPoint1(x_max, y_max);
 
-			imshow("RESULT" + to_string(m), result_image);
-			waitKey(20);
+			if(cell[m].getPoint0() != cell[m].getPoint1())
+				rectangle(
+					result_image,
+					cell[m].getPoint0(),
+					cell[m].getPoint1(),
+					Scalar(255, 0, 0),
+					1,
+					4
+				);
+
+			//imshow("RESULT" + to_string(m), result_image);
+			//waitKey(20);
 			
+			
+
 			// 結果を出力
 			result(result_image, cell[m]);
 			
