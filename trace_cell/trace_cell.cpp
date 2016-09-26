@@ -148,7 +148,7 @@ Point fillColor(Mat img, Cell cell, int x, int y)
 void result(Mat img, Cell cell)
 {
 	stringstream s;
-	s << ".\\original_images\\CO2_2008_20_pos-1\\Results\\";
+	s << directory + "\\Results\\";
 	s << cell.getM() << "_time_" << setw(3) << setfill('0') <<
 		cell.getT2() << ".bmp";
 	imwrite(s.str(), img);

@@ -8,14 +8,16 @@ using namespace cv;
 
 int x_max = 0, x_min = 0;
 int y_max = 0, y_min = 0;
+string directory;
 
-int main()
+int main(int argc, char* argv[])
 {
-	string input_file_name = "original_images\\CO2_2008_20_pos-1\\input.csv";
+	directory = argv[1];
+	string input_file_name = directory + "\\input.csv";
 	string image_name[3];
-	image_name[GREEN] = "original_images\\CO2_2008_20_pos-1\\Green\\time_";
-	image_name[RED]   = "original_images\\CO2_2008_20_pos-1\\Red\\time_";
-	image_name[DIC]   = "original_images\\CO2_2008_20_pos-1\\DIC\\time_";
+	image_name[GREEN] = directory +	"\\Green\\time_";
+	image_name[RED]   = directory +	"\\Red\\time_";
+	image_name[DIC]   = directory + "\\DIC\\time_";
 	
 	ifstream ifs;
 	ifs.open(input_file_name);
@@ -58,7 +60,7 @@ int main()
 		ifs >> cell[i];
 	
 	// 二値化，膨張，収縮
-	for(int i = 0; i < 2; i++)
+	for(int i = 0; i < 3; i++)
 	{
 		for(int j = 0; j <= Cell::getT1(); j++)
 		{
@@ -77,10 +79,14 @@ int main()
 				Cell::getImage(static_cast<cell_color>(i), j),
 				Mat(), Point(-1, -1), 3
 			);
+
 		}
 	}
 
-
+	//for(int i = 0; i < 3; i++)
+	//	for(int j = 0; j <= Cell::getT1(); j++)
+	//		imshow(to_string(i) + ", " + to_string(j), 
+	//			Cell::getImage(static_cast<cell_color>(i), j));
 	
 	// 結果出力用
 	Mat result_image(

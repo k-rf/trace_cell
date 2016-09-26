@@ -15,6 +15,7 @@ extern int x_max;
 extern int x_min;
 extern int y_max;
 extern int y_min;
+extern std::string directory;
 
 // 文字列から不要なコンマを消去する
 std::string eraseComma(std::string str);
