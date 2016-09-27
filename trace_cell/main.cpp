@@ -72,30 +72,41 @@ int main(int argc, char* argv[])
 	{
 		for(int j = 0; j <= Cell::getT1(); j++)
 		{
-			threshold(
-				Cell::getImage(static_cast<cell_color>(i), j),
-				Cell::getImage(static_cast<cell_color>(i), j),
-				0, 200, cv::THRESH_BINARY | cv::THRESH_OTSU
-			);
-			erode(
-				Cell::getImage(static_cast<cell_color>(i), j),
-				Cell::getImage(static_cast<cell_color>(i), j),
-				Mat(), Point(-1, -1), 3
-			);
-			dilate(
-				Cell::getImage(static_cast<cell_color>(i), j),
-				Cell::getImage(static_cast<cell_color>(i), j),
-				Mat(), Point(-1, -1), 3
-			);
+			Mat img = Cell::getImage(static_cast<cell_color>(i), j);
 
+			switch(static_cast<cell_color>(i))
+			{
+			case DIC:
+				threshold(
+					img, img, 90, 0,
+					CV_THRESH_TOZERO | CV_THRESH_OTSU
+				);
+
+				break;
+				
+
+			default:
+				threshold(
+					img, img, 0, 200,
+					CV_THRESH_BINARY | CV_THRESH_OTSU
+				);
+
+				erode(img, img, Mat(), Point(-1, -1), 3);
+				dilate(img, img, Mat(), Point(-1, -1), 3);
+				
+				break;
+			}
 		}
 	}
 
-	//for(int i = 0; i < 3; i++)
-	//	for(int j = 0; j <= Cell::getT1(); j++)
-	//		imshow(to_string(i) + ", " + to_string(j), 
-	//			Cell::getImage(static_cast<cell_color>(i), j));
+	for(int i = 0; i < 3; i++)
+		for(int j = 41; j <= Cell::getT1(); j++)
+			imshow(to_string(i) + ", " + to_string(j), 
+				Cell::getImage(static_cast<cell_color>(i), j));
 	
+	waitKey(0);
+	exit(0);
+
 	// åãâ èoóÕóp
 	Mat result_image(
 		Cell::getImage(GREEN, 0).rows,
