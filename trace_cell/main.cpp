@@ -93,26 +93,13 @@ int main(int argc, char* argv[])
 		{
 			Mat img = Cell::getImage(static_cast<cell_color>(i), j);
 
-
-			//adaptiveThreshold(img, img, 200, CV_ADAPTIVE_THRESH_GAUSSIAN_C,
-			//	CV_THRESH_BINARY, 3, 5);
-			//medianBlur(img, img, 35);
 			switch(static_cast<cell_color>(i))
 			{
 			case DIC:
 				threshold(img, img, 95, 0, CV_THRESH_TOZERO);
-				//Laplacian(img, img, CV_8U, 7);
-				//adaptiveThreshold(img, img, 200, CV_ADAPTIVE_THRESH_GAUSSIAN_C,
-				//	CV_THRESH_BINARY_INV, 3, 5);
-				//threshold(img, img, 60, 0, CV_THRESH_TOZERO | CV_THRESH_OTSU);
 				threshold(img, img, 90, 200, CV_THRESH_BINARY | CV_THRESH_OTSU);
-
-				//dilate(img, img, Mat(), Point(-1, -1), 1);
 				erode(img, img, Mat(), Point(-1, -1), 1);
 				dilate(img, img, Mat(), Point(-1, -1), 3);
-				//erode(img, img, Mat(), Point(-1, -1), 2);
-				//threshold(img, img, 90, 200, CV_THRESH_BINARY | CV_THRESH_OTSU);
-
 				break;
 
 			default:
@@ -128,26 +115,6 @@ int main(int argc, char* argv[])
 		}
 	}
 		
-	//for(int j = 0; j <= Cell::getT1(); j++)
-	//{
-	//	for(int i = 0; i < 3; i++)
-	//	{
-	//		namedWindow(enumStr(static_cast<cell_color>(i)) + to_string(j));
-	//		imshow(
-	//			enumStr(static_cast<cell_color>(i)) + to_string(j),
-	//			Cell::getImage(static_cast<cell_color>(i), j)
-	//		);
-	//	}
-	//	waitKey(0);
-	//	destroyAllWindows();
-	//}
-
-	//waitKey(0);
-	//exit(0);
-
-	// åãâ èoóÕóp
-	
-	
 	all_final = new Mat[Cell::getT1() + 1];
 
 	for(int i = 0; i < WIDTH; i++)
@@ -183,8 +150,6 @@ int main(int argc, char* argv[])
 			top_x = x_center + (x_margin / 2);
 			top_y = y_center + (y_margin / 2);
 
-			//top_thresh = cell[m].getColorValue() * 1.35;
-			//under_thresh = cell[m].getColorValue() * 0.95;
 			repeat_max = x_margin * y_margin;
 
 			for(int i = 0; i < 200; i++)
@@ -216,20 +181,7 @@ int main(int argc, char* argv[])
 			for(int i = 0; i < 200; i++)
 				if(gray.at<uchar>(random_y[i], random_x[i]) != 0)
 					white_count++;
-			
-			//Mat tmp = gray.clone();
-			//	rectangle(
-			//		tmp,
-			//		cell[m].getPoint0(),
-			//		cell[m].getPoint1(),
-			//		Scalar(255, 0, 0),
-			//		1,
-			//		4
-			//	);
 
-			//imshow("gr", gray);
-			//waitKey(0);
-			//cout << cell[m] << "\n";
 			if(
 				fill_color == BLACK ?
 				(white_count > 100 || white_count < 5) : 
@@ -247,20 +199,6 @@ int main(int argc, char* argv[])
 					cell[m].setPoint0(x_min, y_min);
 				if(y_min != y_max)
 					cell[m].setPoint1(x_max, y_max);
-
-
-				//if(cell[m].getPoint0() != cell[m].getPoint1())
-				//	rectangle(
-				//		result_image,
-				//		cell[m].getPoint0(),
-				//		cell[m].getPoint1(),
-				//		Scalar(255, 0, 0),
-				//		1,
-				//		4
-				//	);
-
-				//imshow("RESULT" + to_string(m), result_image);
-				//waitKey(0);
 
 				for(int i = cell[m].getX0(); i < cell[m].getX1(); i++)
 					for(int j = cell[m].getY0(); j < cell[m].getY1(); j++)

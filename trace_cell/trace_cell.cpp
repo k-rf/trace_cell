@@ -96,8 +96,6 @@ void fillColor(int x, int y)
 	if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT) { return; }
 	if(result_image.at<Vec3b>(y, x) != WW) { return; }
 	if(gray.at<uchar>(y, x) == 0) { return; }
-	//if(x < under_x || x > top_x || y < under_y || y > top_y)
-	//	return;
 
 	if(x < x_min) { x_min = x; }
 	if(x > x_max) { x_max = x; }
@@ -112,11 +110,6 @@ void fillColor(int x, int y)
 		result_image.at<Vec3b>(y, x) = YY;
 	else if(fill_color == BLACK)
 		result_image.at<Vec3b>(y, x) = BB;
-
-
-	//imshow("test", result_image);
-	//waitKey(1);
-
 
 	fillColor(x - 1, y);
 	fillColor(x, y - 1);
