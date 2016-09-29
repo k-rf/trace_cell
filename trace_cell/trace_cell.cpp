@@ -125,7 +125,7 @@ void fillColor(int x, int y)
 void result(Mat& img, Cell cell)
 {
 	stringstream s;
-	s << directory + "\\Results\\";
+	s << directory << "\\Results\\";
 	s << cell.getM() << "_time_" << setw(3) << setfill('0') <<
 		cell.getT2() << ".bmp";
 	imwrite(s.str(), img);
@@ -134,7 +134,7 @@ void result(Mat& img, Cell cell)
 void allResult(Mat& img, int i)
 {
 	stringstream s;
-	s << directory + "\\All\\";
+	s << directory << "\\All\\";
 	s << "all_time_" << setw(3) << setfill('0') << i << ".bmp";
 	imwrite(s.str(), img);
 }

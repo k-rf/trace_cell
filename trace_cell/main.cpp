@@ -45,6 +45,13 @@ int main(int argc, char* argv[])
 	image_name[GREEN] = directory +	"\\Green\\time_";
 	image_name[RED]   = directory +	"\\Red\\time_";
 	image_name[DIC]   = directory + "\\DIC\\time_";
+
+	stringstream ss1, ss2;
+	ss1 << directory << "\\All";
+	_mkdir(ss1.str().c_str());
+	ss2 << directory << "\\Results";
+	_mkdir(ss2.str().c_str());
+
 	
 	ifstream ifs;
 	ifs.open(input_file_name);
@@ -115,13 +122,13 @@ int main(int argc, char* argv[])
 		}
 	}
 		
-	all_final = new Mat[Cell::getT1() + 1];
+	all_final = new Mat[Cell::getT1() - Cell::getT0() + 1];
 
 	for(int i = 0; i < WIDTH; i++)
 		for(int j = 0; j < HEIGHT; j++)
 			result_image.at<Vec3b>(j, i) = Vec3b(255, 255, 255);
 
-	for(int i = 0; i <= Cell::getT1(); i++)
+	for(int i = 0; i <= Cell::getT1() - Cell::getT0(); i++)
 		all_final[i] = result_image.clone();
 
 
@@ -197,7 +204,7 @@ int main(int argc, char* argv[])
 				for(int i = cell[m].getX0(); i < cell[m].getX1(); i++)
 					for(int j = cell[m].getY0(); j < cell[m].getY1(); j++)
 						if(result_image.at<Vec3b>(j, i) != Vec3b(255, 255, 255))
-							all_final[t].at<Vec3b>(j, i) = result_image.at<Vec3b>(j, i);
+							all_final[t - Cell::getT0()].at<Vec3b>(j, i) = result_image.at<Vec3b>(j, i);
 			}
 
 			// Œ‹‰Ê‚ğo—Í
@@ -216,14 +223,14 @@ int main(int argc, char* argv[])
 
 	cout << process_time.elapsed() << " msec\n";
 	
-	for(int i = 0; i <= Cell::getT1(); i++)
+	for(int i = 0; i <= Cell::getT1() - Cell::getT0(); i++)
 	{
-		allResult(all_final[i], i);
+		allResult(all_final[i], i + Cell::getT0());
 	}
 
-	int value = 0;
+	int value = Cell::getT0();
 	namedWindow("all");
-	createTrackbar("time", "all", &value, Cell::getT1(), track);
+	createTrackbar("time", "all", &value, Cell::getT1() - Cell::getT0(), track);
 	setTrackbarPos("time", "all", 0);
 
 	waitKey(0);
