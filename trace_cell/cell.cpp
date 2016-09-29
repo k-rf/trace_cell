@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "cell.hpp"
+#include "trace_cell.hpp"
 
 using namespace std;
 using namespace cv;
@@ -219,7 +220,8 @@ ostream& operator << (ostream& os, Cell& cell)
 	os <<
 		setw(3) << cell.m << ", " << setw(3) << cell.t2 << ", " <<
 		setw(3) << cell.x0 << ", " << setw(3) << cell.y0 << ", " <<
-		setw(3) << cell.x1 << ", " << setw(3) << cell.y1;
+		setw(3) << cell.x1 << ", " << setw(3) << cell.y1 <<
+		enumStr(cell.getColor());
 
 	return os;
 }

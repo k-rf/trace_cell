@@ -110,6 +110,8 @@ void fillColor(int x, int y)
 		result_image.at<Vec3b>(y, x) = RR;
 	else if(fill_color == YELLOW)
 		result_image.at<Vec3b>(y, x) = YY;
+	else if(fill_color == BLACK)
+		result_image.at<Vec3b>(y, x) = BB;
 
 
 	//imshow("test", result_image);
@@ -150,13 +152,13 @@ void track(int thres, void*)
 	imshow("all", all_final[thres]);
 }
 
-void progressBar(int per)
+void progressBar(int per, int x, char c)
 {
 	stringstream s;
 	s << "||";
 	for(int i = 0; i < 40; i++)
 	{
-		if(i * Cell::getTotal() / 40 < per) { s << "="; }
+		if(i * x / 40 < per) { s << c; }
 		else { s << " "; }
 	}
 	s << "||\r";

@@ -14,6 +14,7 @@
 #define GG Vec3b(0, 255, 0)
 #define RR Vec3b(0, 0, 255)
 #define YY Vec3b(0, 255, 255)
+#define BB Vec3b(0, 0, 0)
 #define WW Vec3b(255, 255, 255)
 
 extern int x_max;
@@ -56,6 +57,6 @@ void result(cv::Mat img, Cell cell);
 void allResult(cv::Mat img, int i);
 
 void track(int thres, void*);
-void progressBar(int per);
+void progressBar(int per, int x, char c);
 
 #endif

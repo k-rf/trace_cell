@@ -93,44 +93,53 @@ int main(int argc, char* argv[])
 		{
 			Mat img = Cell::getImage(static_cast<cell_color>(i), j);
 
-			
-			threshold(img, img, 30, 0, CV_THRESH_TOZERO | CV_THRESH_OTSU);
-			erode(img, img, Mat(), Point(-1, -1), 1);
-			dilate(img, img, Mat(), Point(-1, -1), 1);
+
 			//adaptiveThreshold(img, img, 200, CV_ADAPTIVE_THRESH_GAUSSIAN_C,
 			//	CV_THRESH_BINARY, 3, 5);
 			//medianBlur(img, img, 35);
-			//switch(static_cast<cell_color>(i))
-			//{
-			//case DIC:
-			//	threshold(img, img, 30, 0, CV_THRESH_TOZERO);
-			//	break;
-			//
-			//default:
-			//	threshold(img, img, 77, 0, CV_THRESH_TOZERO);
-			//	break;
-			//}
+			switch(static_cast<cell_color>(i))
+			{
+			case DIC:
+				threshold(img, img, 95, 0, CV_THRESH_TOZERO);
+				//Laplacian(img, img, CV_8U, 7);
+				//adaptiveThreshold(img, img, 200, CV_ADAPTIVE_THRESH_GAUSSIAN_C,
+				//	CV_THRESH_BINARY_INV, 3, 5);
+				//threshold(img, img, 60, 0, CV_THRESH_TOZERO | CV_THRESH_OTSU);
+				threshold(img, img, 90, 200, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
-			//threshold(img, img, 30, 0, CV_THRESH_TOZERO | CV_THRESH_OTSU);
-			threshold(img, img, 90, 200, CV_THRESH_BINARY | CV_THRESH_OTSU);
-			erode(img, img, Mat(), Point(-1, -1), 3);
-			dilate(img, img, Mat(), Point(-1, -1), 3);
-			//Laplacian(img, img, CV_8U, 3);
-			//
+				//dilate(img, img, Mat(), Point(-1, -1), 1);
+				erode(img, img, Mat(), Point(-1, -1), 1);
+				dilate(img, img, Mat(), Point(-1, -1), 3);
+				//erode(img, img, Mat(), Point(-1, -1), 2);
+				//threshold(img, img, 90, 200, CV_THRESH_BINARY | CV_THRESH_OTSU);
+
+				break;
+
+			default:
+				threshold(img, img, 30, 0, CV_THRESH_TOZERO | CV_THRESH_OTSU);
+				erode(img, img, Mat(), Point(-1, -1), 1);
+				dilate(img, img, Mat(), Point(-1, -1), 1);
+				threshold(img, img, 90, 200, CV_THRESH_BINARY | CV_THRESH_OTSU);
+				erode(img, img, Mat(), Point(-1, -1), 3);
+				dilate(img, img, Mat(), Point(-1, -1), 3);
+				break;
+			}
+			progressBar(j * 100 / Cell::getT1(), Cell::getT1(), '*');
 		}
 	}
-	
-	
+		
 	//for(int j = 0; j <= Cell::getT1(); j++)
 	//{
 	//	for(int i = 0; i < 3; i++)
 	//	{
+	//		namedWindow(enumStr(static_cast<cell_color>(i)) + to_string(j));
 	//		imshow(
-	//			enumStr(static_cast<cell_color>(i)),
+	//			enumStr(static_cast<cell_color>(i)) + to_string(j),
 	//			Cell::getImage(static_cast<cell_color>(i), j)
 	//		);
 	//	}
 	//	waitKey(0);
+	//	destroyAllWindows();
 	//}
 
 	//waitKey(0);
@@ -189,7 +198,10 @@ int main(int argc, char* argv[])
 			}
 			
 			if(cell[m].getColor() == BLACK)
-				break;
+			{
+				gray = Cell::getImage(DIC, cell[m].getT2());
+				fill_color = BLACK;
+			}
 			else if(cell[m].getColor() == YELLOW)
 			{
 				gray = Cell::getImage(RED, cell[m].getT2());
@@ -205,14 +217,27 @@ int main(int argc, char* argv[])
 				if(gray.at<uchar>(random_y[i], random_x[i]) != 0)
 					white_count++;
 			
-			imshow("gr", gray);
-			waitKey(0);
+			//Mat tmp = gray.clone();
+			//	rectangle(
+			//		tmp,
+			//		cell[m].getPoint0(),
+			//		cell[m].getPoint1(),
+			//		Scalar(255, 0, 0),
+			//		1,
+			//		4
+			//	);
 
-			if(white_count > 195)
+			//imshow("gr", gray);
+			//waitKey(0);
+			//cout << cell[m] << "\n";
+			if(
+				fill_color == BLACK ?
+				(white_count > 100 || white_count < 5) : 
+				(white_count > 150 || white_count < 5)
+				)
 			{
 				cell[m].setT2(t - 1);
 				white_count = 0;
-				progressBar(m * 100 / Cell::getTotal());
 				break;
 			}
 			else
@@ -251,9 +276,8 @@ int main(int argc, char* argv[])
 			// 出力用画像のリセット
 			result_image = Scalar(255, 255, 255);
 			white_count = 0;
-			progressBar(m * 100 / Cell::getTotal());
 		}
-		progressBar(m * 100 / Cell::getTotal());
+		progressBar(m * 100 / Cell::getTotal(), Cell::getTotal(), '=');
 	}
 	
 	cout << "\nEND\n";
@@ -267,8 +291,8 @@ int main(int argc, char* argv[])
 
 	int value = 0;
 	namedWindow("all");
-	createTrackbar("cell", "all", &value, Cell::getT1(), track);
-	setTrackbarPos("cell", "all", 0);
+	createTrackbar("time", "all", &value, Cell::getT1(), track);
+	setTrackbarPos("time", "all", 0);
 
 	waitKey(0);
 
