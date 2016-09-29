@@ -53,8 +53,8 @@ cell_color determineColor(Cell& cell);
 void fillColor(int x, int y);
 
 // èoóÕ
-void result(cv::Mat img, Cell cell);
-void allResult(cv::Mat img, int i);
+void result(cv::Mat& img, Cell cell);
+void allResult(cv::Mat& img, int i);
 
 void track(int thres, void*);
 void progressBar(int per, int x, char c);

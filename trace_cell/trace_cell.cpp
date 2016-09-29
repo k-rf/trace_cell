@@ -122,7 +122,7 @@ void fillColor(int x, int y)
 // ============================================================================
 // Œ‹‰Ê‚ğo—Í
 // ============================================================================
-void result(Mat img, Cell cell)
+void result(Mat& img, Cell cell)
 {
 	stringstream s;
 	s << directory + "\\Results\\";
@@ -131,7 +131,7 @@ void result(Mat img, Cell cell)
 	imwrite(s.str(), img);
 }
 
-void allResult(Mat img, int i)
+void allResult(Mat& img, int i)
 {
 	stringstream s;
 	s << directory + "\\All\\";

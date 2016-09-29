@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
 				if(random_y[i] < 7) { random_y[i] += 7; }
 				if(random_y[i] > HEIGHT - 7) { random_y[i] -= 7; }
 			}
-			
+
 			if(cell[m].getColor() == BLACK)
 			{
 				gray = Cell::getImage(DIC, cell[m].getT2());
@@ -177,24 +177,18 @@ int main(int argc, char* argv[])
 				gray = Cell::getImage(cell[m].getColor(), cell[m].getT2());
 				fill_color = cell[m].getColor();
 			}
-			
+
 			for(int i = 0; i < 200; i++)
 				if(gray.at<uchar>(random_y[i], random_x[i]) != 0)
 					white_count++;
 
-			if(
-				fill_color == BLACK ?
-				(white_count > 100 || white_count < 5) : 
-				(white_count > 150 || white_count < 5)
-				)
-			{
-				cell[m].setT2(t - 1);
-				white_count = 0;
-				break;
-			}
+		
+			if(white_count > 150)
+				;
 			else
 			{
 				fillColor(x_center, y_center);
+
 				if(x_min != x_max)
 					cell[m].setPoint0(x_min, y_min);
 				if(y_min != y_max)
@@ -205,15 +199,15 @@ int main(int argc, char* argv[])
 						if(result_image.at<Vec3b>(j, i) != Vec3b(255, 255, 255))
 							all_final[t].at<Vec3b>(j, i) = result_image.at<Vec3b>(j, i);
 			}
+
 			// 結果を出力
 			result(result_image, cell[m]);
-
 			// 一つ前の時刻に設定
 			cell[m].setT2(t - 1);
-
 			// 出力用画像のリセット
 			result_image = Scalar(255, 255, 255);
 			white_count = 0;
+
 		}
 		progressBar(m * 100 / Cell::getTotal(), Cell::getTotal(), '=');
 	}
