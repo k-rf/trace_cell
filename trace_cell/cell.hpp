@@ -31,6 +31,7 @@ class Cell
 	static int t1;      // 終了時刻
 	static int total;   // 細胞の総数
 
+	int color_value;   // 中心の色の値
 	cell_color color;   // 細胞の色
 
 	static cv::Mat* green_image;  // 緑の画像
@@ -64,7 +65,7 @@ public:
 	cv::Point getPoint0() const;
 	cv::Point getPoint1() const;
 
-
+	int getColorValue() const;
 	cell_color getColor() const;
 
 	static cv::Mat getImage(cell_color _color, int _t);
@@ -94,6 +95,7 @@ public:
 	void setPoint0(int _x0, int _y0);
 	void setPoint1(int _x1, int _y1);
 
+	void setColorValue(int _color_value);
 	void setColor(cell_color _color);
 
 	// ファイル名から画像を読み込む

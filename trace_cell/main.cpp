@@ -2,16 +2,35 @@
 
 #include "trace_cell.hpp"
 #include "cell.hpp"
+#include "Timer.hpp"
+
+#include <random>
 
 using namespace std;
 using namespace cv;
 
 int x_max = 0, x_min = 0;
 int y_max = 0, y_min = 0;
+
+int under_x, top_x;
+int under_y, top_y;
+
+double top_thresh;
+double under_thresh;
+
+int repeat_max = 0;
+
 string directory;
+cell_color fill_color;
+Mat result_image(HEIGHT, WIDTH, CV_8UC3);
+Mat* all_final;
+Mat gray;
 
 int main(int argc, char* argv[])
 {
+	Timer process_time;
+	process_time.restart();
+
 	if(argc < 2)
 	{
 		cout << "入力ファイルがありません．\n";
@@ -74,50 +93,65 @@ int main(int argc, char* argv[])
 		{
 			Mat img = Cell::getImage(static_cast<cell_color>(i), j);
 
-			switch(static_cast<cell_color>(i))
-			{
-			case DIC:
-				threshold(
-					img, img, 90, 0,
-					CV_THRESH_TOZERO | CV_THRESH_OTSU
-				);
+			
+			threshold(img, img, 30, 0, CV_THRESH_TOZERO | CV_THRESH_OTSU);
+			erode(img, img, Mat(), Point(-1, -1), 1);
+			dilate(img, img, Mat(), Point(-1, -1), 1);
+			//adaptiveThreshold(img, img, 200, CV_ADAPTIVE_THRESH_GAUSSIAN_C,
+			//	CV_THRESH_BINARY, 3, 5);
+			//medianBlur(img, img, 35);
+			//switch(static_cast<cell_color>(i))
+			//{
+			//case DIC:
+			//	threshold(img, img, 30, 0, CV_THRESH_TOZERO);
+			//	break;
+			//
+			//default:
+			//	threshold(img, img, 77, 0, CV_THRESH_TOZERO);
+			//	break;
+			//}
 
-				break;
-				
-
-			default:
-				threshold(
-					img, img, 0, 200,
-					CV_THRESH_BINARY | CV_THRESH_OTSU
-				);
-
-				erode(img, img, Mat(), Point(-1, -1), 3);
-				dilate(img, img, Mat(), Point(-1, -1), 3);
-				
-				break;
-			}
+			//threshold(img, img, 30, 0, CV_THRESH_TOZERO | CV_THRESH_OTSU);
+			threshold(img, img, 90, 200, CV_THRESH_BINARY | CV_THRESH_OTSU);
+			erode(img, img, Mat(), Point(-1, -1), 3);
+			dilate(img, img, Mat(), Point(-1, -1), 3);
+			//Laplacian(img, img, CV_8U, 3);
+			//
 		}
 	}
-
-	for(int i = 0; i < 3; i++)
-		for(int j = 41; j <= Cell::getT1(); j++)
-			imshow(to_string(i) + ", " + to_string(j), 
-				Cell::getImage(static_cast<cell_color>(i), j));
 	
-	waitKey(0);
-	exit(0);
+	
+	//for(int j = 0; j <= Cell::getT1(); j++)
+	//{
+	//	for(int i = 0; i < 3; i++)
+	//	{
+	//		imshow(
+	//			enumStr(static_cast<cell_color>(i)),
+	//			Cell::getImage(static_cast<cell_color>(i), j)
+	//		);
+	//	}
+	//	waitKey(0);
+	//}
+
+	//waitKey(0);
+	//exit(0);
 
 	// 結果出力用
-	Mat result_image(
-		Cell::getImage(GREEN, 0).rows,
-		Cell::getImage(GREEN, 0).cols,
-		CV_8UC3
-	);
+	
+	
+	all_final = new Mat[Cell::getT1() + 1];
 
 	for(int i = 0; i < WIDTH; i++)
 		for(int j = 0; j < HEIGHT; j++)
 			result_image.at<Vec3b>(j, i) = Vec3b(255, 255, 255);
 
+	for(int i = 0; i <= Cell::getT1(); i++)
+		all_final[i] = result_image.clone();
+
+
+	std::random_device rnd_x, rnd_y;
+	int random_x[200], random_y[200];
+	int white_count = 0;
 
 	for(int m = 0; m < Cell::getTotal(); m++)
 	{
@@ -133,47 +167,111 @@ int main(int argc, char* argv[])
 			x_max = x_min = x_center;
 			y_max = y_min = y_center;
 
-			// 着色
-			fillColor(result_image, cell[m], x_center, y_center);
+			int x_margin = (cell[m].getX1() - cell[m].getX0()) * 2;
+			int y_margin = (cell[m].getY1() - cell[m].getY0()) * 2;
+			under_x = x_center - (x_margin / 2);
+			under_y = y_center - (y_margin / 2);
+			top_x = x_center + (x_margin / 2);
+			top_y = y_center + (y_margin / 2);
 
-			cell[m].setPoint0(x_min, y_min);
-			cell[m].setPoint1(x_max, y_max);
+			//top_thresh = cell[m].getColorValue() * 1.35;
+			//under_thresh = cell[m].getColorValue() * 0.95;
+			repeat_max = x_margin * y_margin;
 
-			if(cell[m].getPoint0() != cell[m].getPoint1())
-				rectangle(
-					result_image,
-					cell[m].getPoint0(),
-					cell[m].getPoint1(),
-					Scalar(255, 0, 0),
-					1,
-					4
-				);
-
-			//imshow("RESULT" + to_string(m), result_image);
-			//waitKey(20);
+			for(int i = 0; i < 200; i++)
+			{
+				random_x[i] = under_x + (rnd_x() % x_margin);
+				random_y[i] = under_y + (rnd_y() % y_margin);
+				if(random_x[i] < 0) { random_x[i] = -random_x[i]; }
+				if(random_y[i] < 0) { random_y[i] = -random_y[i]; }
+				if(random_y[i] < 7) { random_y[i] += 7; }
+				if(random_y[i] > HEIGHT - 7) { random_y[i] -= 7; }
+			}
 			
+			if(cell[m].getColor() == BLACK)
+				break;
+			else if(cell[m].getColor() == YELLOW)
+			{
+				gray = Cell::getImage(RED, cell[m].getT2());
+				fill_color = YELLOW;
+			}
+			else
+			{
+				gray = Cell::getImage(cell[m].getColor(), cell[m].getT2());
+				fill_color = cell[m].getColor();
+			}
 			
+			for(int i = 0; i < 200; i++)
+				if(gray.at<uchar>(random_y[i], random_x[i]) != 0)
+					white_count++;
+			
+			imshow("gr", gray);
+			waitKey(0);
 
+			if(white_count > 195)
+			{
+				cell[m].setT2(t - 1);
+				white_count = 0;
+				progressBar(m * 100 / Cell::getTotal());
+				break;
+			}
+			else
+			{
+				fillColor(x_center, y_center);
+				if(x_min != x_max)
+					cell[m].setPoint0(x_min, y_min);
+				if(y_min != y_max)
+					cell[m].setPoint1(x_max, y_max);
+
+
+				//if(cell[m].getPoint0() != cell[m].getPoint1())
+				//	rectangle(
+				//		result_image,
+				//		cell[m].getPoint0(),
+				//		cell[m].getPoint1(),
+				//		Scalar(255, 0, 0),
+				//		1,
+				//		4
+				//	);
+
+				//imshow("RESULT" + to_string(m), result_image);
+				//waitKey(0);
+
+				for(int i = cell[m].getX0(); i < cell[m].getX1(); i++)
+					for(int j = cell[m].getY0(); j < cell[m].getY1(); j++)
+						if(result_image.at<Vec3b>(j, i) != Vec3b(255, 255, 255))
+							all_final[t].at<Vec3b>(j, i) = result_image.at<Vec3b>(j, i);
+			}
 			// 結果を出力
 			result(result_image, cell[m]);
-			
+
 			// 一つ前の時刻に設定
 			cell[m].setT2(t - 1);
 
 			// 出力用画像のリセット
 			result_image = Scalar(255, 255, 255);
+			white_count = 0;
+			progressBar(m * 100 / Cell::getTotal());
 		}
-		destroyWindow("RESULT" + to_string(m));
-		cout <<
-			"|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n";
+		progressBar(m * 100 / Cell::getTotal());
 	}
 	
-	cout << "END\n";
+	cout << "\nEND\n";
+
+	cout << process_time.elapsed() << " msec\n";
+	
+	for(int i = 0; i <= Cell::getT1(); i++)
+	{
+		allResult(all_final[i], i);
+	}
+
+	int value = 0;
+	namedWindow("all");
+	createTrackbar("cell", "all", &value, Cell::getT1(), track);
+	setTrackbarPos("cell", "all", 0);
 
 	waitKey(0);
 
-	
-	
 	return 0;
 }
 

@@ -11,11 +11,33 @@
 
 #include "cell.hpp"
 
+#define GG Vec3b(0, 255, 0)
+#define RR Vec3b(0, 0, 255)
+#define YY Vec3b(0, 255, 255)
+#define WW Vec3b(255, 255, 255)
+
 extern int x_max;
 extern int x_min;
 extern int y_max;
 extern int y_min;
+
+// 追跡上下限
+extern int under_x;
+extern int top_x;
+extern int under_y;
+extern int top_y;
+
+// 上下の閾値
+extern double top_thresh;
+extern double under_thresh;
+
+extern int repeat_max;
+
 extern std::string directory;
+extern cell_color fill_color;
+extern cv::Mat result_image;
+extern cv::Mat* all_final;
+extern cv::Mat gray;
 
 // 文字列から不要なコンマを消去する
 std::string eraseComma(std::string str);
@@ -27,9 +49,13 @@ std::string enumStr(cell_color c);
 cell_color determineColor(Cell& cell);
 
 // 着色，追跡
-cv::Point fillColor(cv::Mat img, Cell cell, int x, int y);
+void fillColor(int x, int y);
 
 // 出力
 void result(cv::Mat img, Cell cell);
+void allResult(cv::Mat img, int i);
+
+void track(int thres, void*);
+void progressBar(int per);
 
 #endif

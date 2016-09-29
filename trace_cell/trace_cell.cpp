@@ -37,6 +37,8 @@ string enumStr(cell_color c)
 		return "  Y ";
 	case BLACK:
 		return "   B";
+	case DIC:
+		return "DIC ";
 	default:
 		return "none";
 	}
@@ -60,16 +62,22 @@ cell_color determineColor(Cell& cell)
 		img[GREEN].at<uchar>(y_center, x_center) != 0 &&
 		img[RED].at<uchar>(y_center, x_center) != 0
 		)
+	{
 		cell.setColor(YELLOW);
-
+		cell.setColorValue(img[RED].at<uchar>(y_center, x_center));
+	}
 	// 細胞が緑色の場合
 	else if(img[GREEN].at<uchar>(y_center, x_center) != 0)
+	{
 		cell.setColor(GREEN);
-
+		cell.setColorValue(img[GREEN].at<uchar>(y_center, x_center));
+	}
 	// 細胞が赤色の場合
 	else if(img[RED].at<uchar>(y_center, x_center) != 0)
+	{
 		cell.setColor(RED);
-
+		cell.setColorValue(img[RED].at<uchar>(y_center, x_center));
+	}
 	// 細胞が黒色の場合，もしくは，二値化によって消えた場合
 	else
 		cell.setColor(BLACK);
@@ -81,63 +89,37 @@ cell_color determineColor(Cell& cell)
 // ============================================================================
 // 着色，追跡
 // ============================================================================
-Point fillColor(Mat img, Cell cell, int x, int y)
+void fillColor(int x, int y)
 {
-	if(x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT)
-		return Point(cell.getXCenter(), cell.getYCenter());
+	//if(repeat_max-- < 0)
+	//	return;
+	if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT) { return; }
+	if(result_image.at<Vec3b>(y, x) != WW) { return; }
+	if(gray.at<uchar>(y, x) == 0) { return; }
+	//if(x < under_x || x > top_x || y < under_y || y > top_y)
+	//	return;
 
-	if(x < x_min)
-		x_min = x;
-	if(x > x_max)
-		x_max = x;
-	if(y < y_min)
-		y_min = y;
-	if(y > y_max)
-		y_max = y;
+	if(x < x_min) { x_min = x; }
+	if(x > x_max) { x_max = x; }
+	if(y < y_min) { y_min = y; }
+	if(y > y_max) { y_max = y; }
 
-	cell_color color = cell.getColor();
-	if(color == YELLOW)
-		//return;
-		color = RED;
-	if(color == BLACK)
-		return Point(cell.getXCenter(), cell.getYCenter());
-	    //color = DIC;
+	if(fill_color == GREEN)
+		result_image.at<Vec3b>(y, x) = GG;
+	else if(fill_color == RED)
+		result_image.at<Vec3b>(y, x) = RR;
+	else if(fill_color == YELLOW)
+		result_image.at<Vec3b>(y, x) = YY;
 
-	if(color == GREEN && (cell.getT2() == 22 || cell.getT2() == 0))
-		return Point(cell.getXCenter(), cell.getYCenter());
-	if(color == RED && cell.getT2() == 0)
-		return Point(cell.getXCenter(), cell.getYCenter());
 
-	if(Cell::getImage(color, cell.getT2()).at<uchar>(y, x) == 0)
-		return Point(cell.getXCenter(), cell.getYCenter());
+	//imshow("test", result_image);
+	//waitKey(1);
 
-	else if(
-		img.at<Vec3b>(y, x) == Vec3b(0, 255, 0) ||
-		img.at<Vec3b>(y, x) == Vec3b(0, 0, 255) ||
-		img.at<Vec3b>(y, x) == Vec3b(0, 255, 255) ||
-		img.at<Vec3b>(y, x) == Vec3b(0, 0, 0)
-		)
-		return Point(cell.getXCenter(), cell.getYCenter());
-	else
-	{
-		switch(cell.getColor())
-		{
-		case GREEN:
-			img.at<Vec3b>(y, x) = Vec3b(0, 255, 0);
-			break;
-		case RED:
-			img.at<Vec3b>(y, x) = Vec3b(0, 0, 255);
-			break;
-		case YELLOW:
-			img.at<Vec3b>(y, x) = Vec3b(0, 255, 255);
-			break;
-		}
-	}
-	
-	fillColor(img, cell, x - 1, y);
-	fillColor(img, cell, x, y + 1);
-	fillColor(img, cell, x + 1, y);
-	fillColor(img, cell, x, y - 1);
+
+	fillColor(x - 1, y);
+	fillColor(x, y - 1);
+	fillColor(x + 1, y);
+	fillColor(x, y + 1);
 }
 
 
@@ -152,4 +134,32 @@ void result(Mat img, Cell cell)
 	s << cell.getM() << "_time_" << setw(3) << setfill('0') <<
 		cell.getT2() << ".bmp";
 	imwrite(s.str(), img);
+}
+
+void allResult(Mat img, int i)
+{
+	stringstream s;
+	s << directory + "\\All\\";
+	s << "all_time_" << setw(3) << setfill('0') << i << ".bmp";
+	imwrite(s.str(), img);
+}
+
+
+void track(int thres, void*)
+{
+	imshow("all", all_final[thres]);
+}
+
+void progressBar(int per)
+{
+	stringstream s;
+	s << "||";
+	for(int i = 0; i < 40; i++)
+	{
+		if(i * Cell::getTotal() / 40 < per) { s << "="; }
+		else { s << " "; }
+	}
+	s << "||\r";
+
+	cout << s.str();
 }

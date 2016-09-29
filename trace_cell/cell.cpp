@@ -51,6 +51,7 @@ int Cell::getCenter() const { return center; }
 Point Cell::getPoint0() const { return Point(getX0(), getY0()); }
 Point Cell::getPoint1() const { return Point(getX1(), getY1()); }
 
+int Cell::getColorValue() const { return color_value; }
 cell_color Cell::getColor() const { return color; }
 
 
@@ -110,6 +111,7 @@ void Cell::setCenter(int _center) { center = _center; }
 void Cell::setPoint0(int _x0, int _y0) { setX0(_x0); setY0(_y0); }
 void Cell::setPoint1(int _x1, int _y1) { setX1(_x1); setY1(_y1); }
 
+void Cell::setColorValue(int _color_value) { color_value = _color_value; }
 void Cell::setColor(cell_color _color) { color = _color; }
 
 
